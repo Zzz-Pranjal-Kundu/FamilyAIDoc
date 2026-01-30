@@ -341,7 +341,7 @@ This tool is designed as an **educational project** and **research prototype**. 
 
 <div align="center">
 
-**Made with ❤️ for healthcare innovation by Rishabh Baloni**
+**Made with ❤️ for healthcare innovation by Pranjal Kundu**
 
 ⭐ Star this repo if you find it helpful!
 
