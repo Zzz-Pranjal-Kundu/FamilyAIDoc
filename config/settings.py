@@ -34,6 +34,7 @@ PAGES = [
     "🫘 Kidney Disease",
     "🫀 Liver Disease",
     "🧠 Parkinson's Disease",
+    "Medical Chatbot",
     "📊 About Models"
 ]
 
