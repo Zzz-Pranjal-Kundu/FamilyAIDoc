@@ -61,3 +61,8 @@ Thumbs.db
 
 # PDFs
 *.pdf
+
+.env.local
+.env
+
+node_modules/
