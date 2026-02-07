@@ -148,8 +148,8 @@ The platform provides healthcare professionals and researchers with a fast, accu
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/Rishabh-Baloni/health-predict.git
-cd health-predict
+git clone https://github.com/Zzz-Pranjal-Kundu/FamilyAIDoc.git
+cd familyAIDoc
 ```
 
 ### Step 2: Create Virtual Environment
