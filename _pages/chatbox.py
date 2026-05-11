@@ -120,10 +120,6 @@ def generate_pdf_report(messages):
 
 # STREAMLIT UI
 def render_chatbox_page():
-    st.set_page_config(
-        page_title="Family AI Medical Assistant",
-        layout="centered"
-    )
     # ---------- MOCKUP CSS & HERO ----------
     from utils.ui_helpers import get_base64_of_bin_file
     steth_b64 = get_base64_of_bin_file(os.path.join("assets", "stethoscope.png"))
