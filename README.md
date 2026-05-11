@@ -1,348 +1,136 @@
-# 🏥 FamilyAIDoc - AI-Powered Multi-Disease Detection Platform
+# 🏥 FamilyAIDoc - Clinical AI Inference Engine
 
-<div align="center">
-
-![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.28-red.svg)
-![scikit-learn](https://img.shields.io/badge/sklearn-1.2.2-orange.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
-
-**An advanced machine learning platform for early detection of chronic diseases**
-
-[Live Demo](#) · [Report Bug](#) · [Request Feature](#)
-
-</div>
+FamilyAIDoc is an enterprise-grade, highly-performant clinical decision support system. Built entirely on **Python 3.12** and **Streamlit**, it implements robust Machine Learning inference pipelines alongside a Retrieval-Augmented Generation (RAG) architecture to provide real-time, explainable diagnostic predictions for chronic diseases.
 
 ---
 
-## 📋 Table of Contents
+## 🏛️ System Architecture
 
-- [Overview](#-overview)
-- [Features](#-features)
-- [Disease Models](#-disease-models)
-- [Tech Stack](#-tech-stack)
-- [Installation](#-installation)
-- [Usage](#-usage)
-- [Model Performance](#-model-performance)
-- [Project Structure](#-project-structure)
-- [Screenshots](#-screenshots)
-- [Contributing](#-contributing)
-- [License](#-license)
-- [Disclaimer](#%EF%B8%8F-disclaimer)
+```mermaid
+graph TD
+    subgraph Frontend [Streamlit UI Client]
+        A[UI Router: app.py] --> B(Diagnostic Modules)
+        A --> C(Medical Assistant)
+        B --> D{Feature Encoders}
+    end
 
----
+    subgraph Inference Layer [Machine Learning Engine]
+        D --> E[Kidney: ExtraTreesClassifier]
+        D --> F[Liver: RandomForestClassifier]
+        D --> G[Neuro: XGBoostClassifier]
+        E & F & G --> H[Prediction Aggregator & Calibrator]
+        H --> I[Clinical Threshold Override]
+    end
 
-## 🌟 Overview
+    subgraph RAG Pipeline [Medical Chatbot]
+        C --> J[NLP Query Processor]
+        J --> K[(Convex Vector Store)]
+        K -- Retrieve Top-K -->> L[Context Builder]
+        L --> M[Groq: Llama-3-8B-Instant]
+    end
 
-FamilyAIDoc is a comprehensive web-based platform that leverages state-of-the-art machine learning algorithms to assist in the early detection of three major chronic diseases:
-
-- 🫘 **Chronic Kidney Disease (CKD)**
-- 🫀 **Liver Disease**
-- 🧠 **Parkinson's Disease**
-
-The platform provides healthcare professionals and researchers with a fast, accurate preliminary assessment tool using clinical parameters and biomarkers.
-
----
-
-## ✨ Features
-
-### 🎯 Core Capabilities
-
-- **Multi-Disease Detection**: Three specialized AI models for different chronic diseases
-- **High Accuracy**: Up to 100% accuracy on kidney disease detection
-- **User-Friendly Interface**: Intuitive Streamlit-based web interface
-- **Real-Time Predictions**: Instant results with confidence scores
-- **Visual Analytics**: Interactive charts and confidence gauges
-- **Sample Data Testing**: Quick test functionality with pre-loaded samples
-- **Clinical Recommendations**: Evidence-based suggestions for each prediction
-
-### 🔬 Advanced Features
-
-- **AutoML Integration**: PyCaret for automated model optimization
-- **Deep Learning**: Neural network models for complex pattern recognition
-- **Feature Engineering**: PCA, SMOTE, and advanced preprocessing
-- **Model Comparison**: Multiple algorithms tested and compared
-- **Scalable Architecture**: Easy to add new disease models
+    subgraph Output Generation
+        I --> N[Plotly Gauge Generation]
+        M --> O[Streamlit Chat Interface]
+        O --> P[ReportLab PDF Engine]
+    end
+```
 
 ---
 
-## 🫘 Disease Models
+## 🧠 Diagnostic Inference Models
 
-### 1. Chronic Kidney Disease (CKD)
+The core of FamilyAIDoc relies on heavily optimized, pre-trained ensemble models serialized via `joblib`. The underlying engine relies on `scikit-learn==1.8.0` and `xgboost>=1.7.6`.
 
-| Metric | Value |
-|--------|-------|
-| **Algorithm** | Extra Trees Classifier |
-| **Accuracy** | 100% |
-| **Features** | 24 clinical parameters |
-| **Dataset** | 400 patients |
+### 🫘 Chronic Kidney Disease (CKD) Pipeline
+- **Algorithm:** `ExtraTreesClassifier` (Extremely Randomized Trees)
+- **Hyperparameters:** `n_estimators=100`, `random_state=42`, `criterion='gini'`
+- **Feature Space:** $N=24$ clinical parameters.
+- **Preprocessing:** 
+  - Mode imputation for categorical features (e.g., `rbc`, `pc`, `ba`).
+  - Median imputation for continuous variables (e.g., `bu`, `sc`).
+  - `MinMaxScaler(feature_range=(-1, 1))` applies uniform scaling across the feature vector.
+- **Clinical Override:** Predictions are subjected to a secondary hardcoded rule-engine (`utils/prediction_helper.py`). If $Serum\_Creatinine > 1.8$ or $Albumin \ge 3$, the system forces a high-risk flag, mitigating false negatives from the ML output.
 
-**Key Features:**
-- Blood tests (Glucose, Urea, Creatinine, Hemoglobin)
-- Urine tests (Specific Gravity, Albumin, Sugar)
-- Clinical history (Hypertension, Diabetes, Anemia)
+### 🫀 Liver Disease Pipeline
+- **Algorithm:** `RandomForestClassifier`
+- **Feature Space:** $N=10$ biomarkers, focusing heavily on hepatobiliary enzymes (SGPT, SGOT, Alkaline Phosphatase).
+- **Evaluation:** Evaluated against baseline Logistic Regression and SVMs; selected for its robust handling of non-linear enzyme relationships and resilience to overfitting.
 
-### 2. Liver Disease
-
-| Metric | Value |
-|--------|-------|
-| **Algorithm** | Random Forest Classifier |
-| **Accuracy** | 70% |
-| **Features** | 10 liver function tests |
-| **Dataset** | 583 patients |
-
-**Key Features:**
-- Bilirubin levels (Total & Direct)
-- Liver enzymes (ALT, AST, Alkaline Phosphotase)
-- Protein markers (Albumin, Total Proteins, A/G Ratio)
-
-### 3. Parkinson's Disease
-
-| Metric | Value |
-|--------|-------|
-| **Algorithm** | XGBoost Classifier |
-| **Accuracy** | 92.31% |
-| **Features** | 22 voice measurements |
-| **Dataset** | 195 voice recordings |
-
-**Key Features:**
-- Frequency variations (Jitter, Shimmer)
-- Vocal fold vibrations
-- Noise-to-harmonics ratio
-- Nonlinear dynamical complexity
+### 🧠 Parkinson's Acoustic Analysis Pipeline
+- **Algorithm:** `XGBClassifier` (Extreme Gradient Boosting)
+- **Feature Space:** $N=22$ extracted speech signal features (Multi-Dimensional Voice Program parameters).
+- **Optimization Metric:** `eval_metric='logloss'`.
+- **Feature Importance:** SHAP and Gini importance metrics identify `PPE` (Pitch Period Entropy) and `spread1` as the highest-weight features governing the decision boundary.
 
 ---
 
-## 💻 Tech Stack
+## 🤖 RAG Architecture (Retrieval-Augmented Generation)
 
-### Machine Learning
-
-- **scikit-learn** 1.2.2 - Core ML algorithms
-- **XGBoost** 1.7.6 - Gradient boosting
-- **PyCaret** 3.2.0 - AutoML framework
-- **TensorFlow** 2.12.0 - Deep learning
-- **Keras** 2.15.0 - Neural networks
-- **Imbalanced-learn** 0.12.4 - SMOTE, RandomOverSampler
-
-### Data Processing
-
-- **Pandas** 1.5.3 - Data manipulation
-- **NumPy** 1.23.5 - Numerical computing
-- **Joblib** 1.2.0 - Model serialization
-
-### Visualization & Deployment
-
-- **Streamlit** 1.28.0 - Web interface
-- **Plotly** 5.17.0 - Interactive charts
+To prevent severe AI hallucinations in clinical contexts, the chatbot implements a strict RAG pipeline:
+1. **Semantic Triage:** User inputs are transmitted to the **Convex HTTP API** (`/api/search_diseases`).
+2. **Context Retrieval:** The backend performs a search against a verified database of clinical definitions, symptoms, and contraindications.
+3. **Prompt Injection:** The retrieved JSON payloads are compiled into a zero-shot system prompt.
+4. **LLM Inference:** The query and contextual prompt are passed to **Groq's LPU inference engine** using the `llama-3.1-8b-instant` model. The temperature is strictly clamped at `T=0.3` to ensure deterministic, low-variance clinical outputs.
 
 ---
 
-## 🚀 Installation
+## 🚀 Environment Initialization
 
 ### Prerequisites
+- Python `3.10` - `3.12`
+- `pip` package manager
 
-- Python 3.8 or higher
-- pip package manager
-- Virtual environment (recommended)
-
-### Step 1: Clone the Repository
-
+### 1. Repository Setup
 ```bash
-git clone https://github.com/Rishabh-Baloni/health-predict.git
+git clone <repository_url>
 cd health-predict
 ```
 
-### Step 2: Create Virtual Environment
-
-```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
-
-# Linux/Mac
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### Step 3: Install Dependencies
-
+### 2. Dependency Resolution
+Strict version locking is enforced for `scikit-learn` to prevent unpickling corruption (e.g., the `monotonic_cst` attribute mismatch bug).
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 4: Train Models (Optional)
+### 3. Environment Configuration
+Create a `.env` file for backend integrations:
+```env
+# Required for LLM Inference
+GROQ_API_KEY=gsk_...
 
-If models are not included, train them first:
+# Required for RAG Database
+CONVEX_URL=https://...
+```
+
+### 4. Server Execution
+```bash
+streamlit run app.py --server.port=8501 --server.address=0.0.0.0
+```
+
+---
+
+## 🔄 Retraining & Continuous Integration
+
+If the underlying datasets (`data/*.csv`) are updated, the serialized model binaries must be regenerated to prevent dimensional mismatch during inference.
+
+The training pipelines use Stratified K-Folds (80/20 splits) and evaluate arrays of models sequentially. Run the specific pipeline from the root directory:
 
 ```bash
-# Train all basic models
+# CKD Retraining Pipeline
 python training_scripts/train_kidney_extratrees.py
+
+# Hepatic Retraining Pipeline
 python training_scripts/train_liver_randomforest.py
+
+# Neuro Acoustic Retraining Pipeline
 python training_scripts/train_parkinsons_xgboost.py
-
-# Train advanced models (optional)
-python training_scripts/train_kidney_pycaret_automl.py
-python training_scripts/train_liver_pycaret_automl.py
-python training_scripts/train_parkinsons_pycaret_automl.py
 ```
 
-### Step 5: Run the Application
-
-```bash
-streamlit run app.py
-```
-
-The app will open in your browser at `http://localhost:8501`
+*Note: The script will automatically overwrite the `.pkl` binaries in the `models/` subdirectory. A manual clear of Streamlit's `@st.cache_resource` or a server restart is required to load the updated weights into RAM.*
 
 ---
 
-## 📖 Usage
+## ⚠️ Regulatory & Compliance Notice
 
-### Quick Start
-
-1. **Select Disease Module**: Choose from the sidebar menu
-2. **Enter Clinical Data**: Fill in patient parameters
-3. **Get Prediction**: Click the predict button
-4. **View Results**: Analyze confidence scores and recommendations
-
-### Sample Data Testing
-
-- Check the "🎲 Use sample patient data" box
-- Pre-filled values will populate automatically
-- Click predict to see instant results
-
-### Interpreting Results
-
-- **Confidence Score**: Model certainty (0-100%)
-- **Positive Detection**: Red alert with clinical recommendations
-- **Negative Detection**: Green confirmation with health tips
-- **Gauge Visualization**: Interactive confidence meter
-
----
-
-## 📊 Model Performance
-
-### Kidney Disease Model Comparison
-
-| Model | Accuracy | Precision | Recall | F1-Score |
-|-------|----------|-----------|--------|----------|
-| **Extra Trees** | **100%** | **100%** | **100%** | **100%** |
-| Logistic Regression | 98.75% | 98.79% | 98.75% | 98.75% |
-| KNN | 98.75% | 98.79% | 98.75% | 98.75% |
-| Random Forest | 97.50% | 97.60% | 97.50% | 97.48% |
-| XGBoost | 97.50% | 97.60% | 97.50% | 97.48% |
-
-### Advanced Techniques Applied
-
-- ✅ PCA for dimensionality reduction (95% variance)
-- ✅ RandomOverSampler for class imbalance
-- ✅ PyCaret AutoML for optimization
-- ✅ Neural Networks with Keras
-- ✅ Cross-validation and hyperparameter tuning
-
----
-
-## 📁 Project Structure
-
-```
-health-predict/
-├── app.py                         # Main Streamlit application
-├── requirements.txt               # Python dependencies
-├── data/                          # Datasets
-│   ├── kidney_disease/
-│   │   └── kidney_disease.csv
-│   ├── liver_disease/
-│   │   └── indian_liver_patient.csv
-│   └── parkinsons_disease/
-│       └── parkinsons.data
-│
-├── models/                        # Trained models and metadata
-│   ├── kidney/
-│   │   ├── kidney_extratrees_basic.pkl
-│   │   ├── kidney_extratrees_scaler.pkl
-│   │   ├── kidney_extratrees_metadata.pkl
-│   │   ├── kidney_extratrees_features.pkl
-│   │   ├── kidney_extratrees_pca_ros.pkl
-│   │   ├── kidney_extratrees_pca_ros_scaler.pkl
-│   │   └── kidney_pycaret_decisiontree.pkl
-│   ├── liver/
-│   │   ├── liver_randomforest_basic.pkl
-│   │   ├── liver_randomforest_scaler.pkl
-│   │   ├── liver_randomforest_metadata.pkl
-│   │   ├── liver_randomforest_features.pkl
-│   │   └── liver_pycaret_xgboost.pkl
-│   └── parkinsons/
-│       ├── parkinsons_xgboost_basic.pkl
-│       ├── parkinsons_xgboost_scaler.pkl
-│       ├── parkinsons_xgboost_metadata.pkl
-│       ├── parkinsons_xgboost_features.pkl
-│       └── parkinsons_pycaret_lightgbm.pkl
-│
-├── training_scripts/              # Model training scripts
-│   ├── train_kidney_extratrees.py
-│   ├── train_kidney_extratrees_pca_ros.py
-│   ├── train_kidney_pycaret_automl.py
-│   ├── train_kidney_neuralnet_keras.py
-│   ├── train_liver_randomforest.py
-│   ├── train_liver_pycaret_automl.py
-│   ├── train_parkinsons_xgboost.py
-│   └── train_parkinsons_pycaret_automl.py
-│
-├── notebooks/                     # Optional notebooks
-├── pages/                         # Optional Streamlit pages
-├── .gitignore                     # Git ignore file
-└── README.md                      # This file
-```
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-### How to Contribute
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## ⚠️ Disclaimer
-
-**IMPORTANT: FOR EDUCATIONAL AND RESEARCH PURPOSES ONLY**
-
-This tool is designed as an **educational project** and **research prototype**. It should NOT be used for:
-
-- ❌ Final medical diagnosis
-- ❌ Treatment decisions
-- ❌ Replacement of professional medical advice
-- ❌ Clinical decision-making without verification
-
-**Always consult qualified healthcare professionals** for medical advice, diagnosis, and treatment. The predictions provided by this system are probabilistic estimates based on machine learning models and may not reflect actual medical conditions.
-
-### Limitations
-
-- Models are trained on limited datasets
-- May not generalize to all populations
-- Accuracy varies by disease type
-- No real-time clinical validation
-- Not FDA approved or clinically validated
-
----
-
-<div align="center">
-
-**Made with ❤️ for healthcare innovation by Rishabh Baloni**
-
-⭐ Star this repo if you find it helpful!
-
-</div>
+**FamilyAIDoc is not an FDA-approved medical device.** The inference engine is designed strictly as a clinical decision support system (CDSS) for educational and research operations. It is not intended for live patient diagnosis, treatment formulation, or emergency triage. Output probabilities are uncalibrated estimates and must be verified by a board-certified physician.

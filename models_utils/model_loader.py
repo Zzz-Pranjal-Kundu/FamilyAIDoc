@@ -20,7 +20,8 @@ def load_model(model_path):
         object: Loaded model or None if loading fails
     """
     try:
-        return joblib.load(model_path)
+        model = joblib.load(model_path)
+        return model
     except Exception as e:
         st.warning(f"Error loading {model_path}: {str(e)}")
         return None

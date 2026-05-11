@@ -124,8 +124,8 @@ def render_chatbox_page():
         page_title="Family AI Medical Assistant",
         layout="centered"
     )
-    st.title("🩺 Interactive Health Assistant")
-    st.caption("AI-powered triage using a verified medical database (Convex + Groq)")
+    st.markdown("<h1>🩺 Interactive Health Assistant</h1>", unsafe_allow_html=True)
+    st.markdown('<p style="color: var(--text-muted); font-size: 1.1rem;">AI-powered triage using a verified medical database (Convex + Groq)</p>', unsafe_allow_html=True)
     st.warning("⚠️ Informational only. Not a substitute for a doctor.")
 
     # ---------- Session State ----------

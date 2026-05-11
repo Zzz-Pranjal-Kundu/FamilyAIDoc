@@ -10,8 +10,8 @@ from utils.prediction_helper import assess_kidney_disease_risk, get_kidney_ckd_s
 
 def render_kidney_page():
     """Render the kidney disease prediction page."""
-    st.title("🫘 Chronic Kidney Disease Prediction")
-    st.markdown("Enter the patient's clinical parameters to predict Chronic Kidney Disease (CKD)")
+    st.markdown("<h1>🫘 Chronic Kidney Disease</h1>", unsafe_allow_html=True)
+    st.markdown('<p style="color: var(--text-muted); font-size: 1.1rem;">Enter the patient\'s clinical parameters to predict Chronic Kidney Disease (CKD) risk using our Extra Trees ensemble model.</p>', unsafe_allow_html=True)
     
     # Load model
     model, scaler = load_kidney_models()
@@ -22,12 +22,12 @@ def render_kidney_page():
         st.markdown('<div class="info-box">✅ Model loaded successfully! Extra Trees Classifier with 100% accuracy</div>', unsafe_allow_html=True)
         
         # Sample Data Buttons
-        st.markdown("### 🎯 Quick Test")
+        st.markdown("### 🎯 Quick Data Load")
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
-            use_sample_ckd = st.button("📊 Load Sample: CKD Patient", use_container_width=True)
+            use_sample_ckd = st.button("📊 Load CKD Profile", use_container_width=True)
         with col_btn2:
-            use_sample_healthy = st.button("📊 Load Sample: Healthy Patient", use_container_width=True)
+            use_sample_healthy = st.button("📊 Load Healthy Profile", use_container_width=True)
         
         # Initialize session state for values
         if 'kidney_values' not in st.session_state:
@@ -42,87 +42,102 @@ def render_kidney_page():
             st.session_state.kidney_values = KIDNEY_HEALTHY_SAMPLE
             st.success("✅ Loaded sample healthy patient data")
         
-        st.markdown("---")
+        st.markdown("<br>", unsafe_allow_html=True)
         
         # Input form
-        st.subheader("Basic Information")
-        age = st.number_input("Age (years) 👤", 1, 120, 
-                            st.session_state.kidney_values.get('age', 50),
-                            help="Patient's age in years")
-        bp = st.number_input("Blood Pressure (mm/Hg) 🫀", 50, 200, 
-                           st.session_state.kidney_values.get('bp', 80),
-                           help="Blood pressure measurement")
-        sg = st.selectbox("Specific Gravity 💧", SG_VALUES,
-                        index=SG_VALUES.index(st.session_state.kidney_values.get('sg', 1.020)),
-                        help="Urine specific gravity")
-        sg_enc = SG_VALUES.index(sg)
-        al = st.selectbox("Albumin 🧪", [0, 1, 2, 3, 4, 5],
-                        index=st.session_state.kidney_values.get('al', 0),
-                        help="Albumin level in urine")
-        su = st.selectbox("Sugar 🍬", [0, 1, 2, 3, 4, 5],
-                        index=st.session_state.kidney_values.get('su', 0),
-                        help="Sugar level in urine")
-        rbc = st.selectbox("Red Blood Cells 🔴", ["normal", "abnormal"],
-                         index=0 if st.session_state.kidney_values.get('rbc', 'normal')=='normal' else 1,
-                         help="RBC in urine test")
-        pc = st.selectbox("Pus Cell 🦠", ["normal", "abnormal"],
-                        index=0 if st.session_state.kidney_values.get('pc', 'normal')=='normal' else 1,
-                        help="Pus cells in urine")
-        pcc = st.selectbox("Pus Cell Clumps 🧫", ["present", "notpresent"],
-                         index=0 if st.session_state.kidney_values.get('pcc', 'notpresent')=='present' else 1,
-                         help="Presence of pus cell clumps")
-        ba = st.selectbox("Bacteria 🦠", ["present", "notpresent"],
-                        index=0 if st.session_state.kidney_values.get('ba', 'notpresent')=='present' else 1,
-                        help="Bacteria in urine")
+        st.markdown("### 👤 Basic Information")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            age = st.number_input("Age (years)", 1, 120, 
+                                st.session_state.kidney_values.get('age', 50),
+                                help="Patient's age in years")
+            bp = st.number_input("Blood Pressure (mm/Hg)", 50, 200, 
+                               st.session_state.kidney_values.get('bp', 80),
+                               help="Blood pressure measurement")
+            sg = st.selectbox("Specific Gravity", SG_VALUES,
+                            index=SG_VALUES.index(st.session_state.kidney_values.get('sg', 1.020)),
+                            help="Urine specific gravity")
+        with col2:
+            sg_enc = SG_VALUES.index(sg)
+            al = st.selectbox("Albumin", [0, 1, 2, 3, 4, 5],
+                            index=st.session_state.kidney_values.get('al', 0),
+                            help="Albumin level in urine")
+            su = st.selectbox("Sugar", [0, 1, 2, 3, 4, 5],
+                            index=st.session_state.kidney_values.get('su', 0),
+                            help="Sugar level in urine")
+            rbc = st.selectbox("Red Blood Cells", ["normal", "abnormal"],
+                             index=0 if st.session_state.kidney_values.get('rbc', 'normal')=='normal' else 1,
+                             help="RBC in urine test")
+        with col3:
+            pc = st.selectbox("Pus Cell", ["normal", "abnormal"],
+                            index=0 if st.session_state.kidney_values.get('pc', 'normal')=='normal' else 1,
+                            help="Pus cells in urine")
+            pcc = st.selectbox("Pus Cell Clumps", ["present", "notpresent"],
+                             index=0 if st.session_state.kidney_values.get('pcc', 'notpresent')=='present' else 1,
+                             help="Presence of pus cell clumps")
+            ba = st.selectbox("Bacteria", ["present", "notpresent"],
+                            index=0 if st.session_state.kidney_values.get('ba', 'notpresent')=='present' else 1,
+                            help="Bacteria in urine")
+        st.markdown("<br>", unsafe_allow_html=True)
         
-        st.subheader("Blood Tests")
-        bgr = st.number_input("Blood Glucose Random (mgs/dl) 🩸", 20, 500, 
-                            st.session_state.kidney_values.get('bgr', 120),
-                            help="Random blood glucose level")
-        bu = st.number_input("Blood Urea (mgs/dl) 🧬", 1, 400, 
-                           st.session_state.kidney_values.get('bu', 40),
-                           help="Blood urea measurement")
-        sc = st.number_input("Serum Creatinine (mgs/dl) ⚗️", 0.1, 20.0, 
-                           float(st.session_state.kidney_values.get('sc', 1.2)), 0.1,
-                           help="Serum creatinine level")
-        sod = st.number_input("Sodium (mEq/L) 🧂", 50, 200, 
-                            st.session_state.kidney_values.get('sod', 140),
-                            help="Sodium level in blood")
-        pot = st.number_input("Potassium (mEq/L) 🥔", 1.0, 20.0, 
-                            float(st.session_state.kidney_values.get('pot', 4.5)), 0.1,
-                            help="Potassium level in blood")
-        hemo = st.number_input("Hemoglobin (gms) 🩸", 1.0, 20.0, 
-                             float(st.session_state.kidney_values.get('hemo', 14.0)), 0.1,
-                             help="Hemoglobin count")
-        pcv = st.number_input("Packed Cell Volume 📊", 10, 60, 
-                            st.session_state.kidney_values.get('pcv', 40),
-                            help="Packed cell volume percentage")
+        st.markdown("### 🩸 Blood Tests")
+        col4, col5, col6 = st.columns(3)
+        with col4:
+            bgr = st.number_input("Glucose Random (mgs/dl)", 20, 500, 
+                                st.session_state.kidney_values.get('bgr', 120),
+                                help="Random blood glucose level")
+            bu = st.number_input("Blood Urea (mgs/dl)", 1, 400, 
+                               st.session_state.kidney_values.get('bu', 40),
+                               help="Blood urea measurement")
+            sc = st.number_input("Serum Creatinine (mgs/dl)", 0.1, 20.0, 
+                               float(st.session_state.kidney_values.get('sc', 1.2)), 0.1,
+                               help="Serum creatinine level")
+        with col5:
+            sod = st.number_input("Sodium (mEq/L)", 50, 200, 
+                                st.session_state.kidney_values.get('sod', 140),
+                                help="Sodium level in blood")
+            pot = st.number_input("Potassium (mEq/L)", 1.0, 20.0, 
+                                float(st.session_state.kidney_values.get('pot', 4.5)), 0.1,
+                                help="Potassium level in blood")
+        with col6:
+            hemo = st.number_input("Hemoglobin (gms)", 1.0, 20.0, 
+                                 float(st.session_state.kidney_values.get('hemo', 14.0)), 0.1,
+                                 help="Hemoglobin count")
+            pcv = st.number_input("Packed Cell Volume", 10, 60, 
+                                st.session_state.kidney_values.get('pcv', 40),
+                                help="Packed cell volume percentage")
+        st.markdown("<br>", unsafe_allow_html=True)
         
-        st.subheader("Additional Parameters")
-        wc = st.number_input("White Blood Cell Count (cells/cumm) ⚪", 1000, 30000, 
-                           st.session_state.kidney_values.get('wc', 8000),
-                           help="WBC count")
-        rc = st.number_input("Red Blood Cell Count (millions/cmm) 🔴", 1.0, 10.0, 
-                           float(st.session_state.kidney_values.get('rc', 4.5)), 0.1,
-                           help="RBC count")
-        htn = st.selectbox("Hypertension 💔", ["yes", "no"],
-                         index=0 if st.session_state.kidney_values.get('htn', 'no')=='yes' else 1,
-                         help="History of hypertension")
-        dm = st.selectbox("Diabetes Mellitus 🍭", ["yes", "no"],
-                        index=0 if st.session_state.kidney_values.get('dm', 'no')=='yes' else 1,
-                        help="History of diabetes")
-        cad = st.selectbox("Coronary Artery Disease 🫀", ["yes", "no"],
-                         index=0 if st.session_state.kidney_values.get('cad', 'no')=='yes' else 1,
-                         help="Coronary artery disease history")
-        appet = st.selectbox("Appetite 🍽️", ["good", "poor"],
-                           index=0 if st.session_state.kidney_values.get('appet', 'good')=='good' else 1,
-                           help="Patient's appetite")
-        pe = st.selectbox("Pedal Edema 🦶", ["yes", "no"],
-                        index=0 if st.session_state.kidney_values.get('pe', 'no')=='yes' else 1,
-                        help="Swelling in feet")
-        ane = st.selectbox("Anemia 🩸", ["yes", "no"],
-                         index=0 if st.session_state.kidney_values.get('ane', 'no')=='yes' else 1,
-                         help="Presence of anemia")
+        st.markdown("### 📋 Additional Parameters")
+        col7, col8, col9 = st.columns(3)
+        with col7:
+            wc = st.number_input("White Blood Cell Count", 1000, 30000, 
+                               st.session_state.kidney_values.get('wc', 8000),
+                               help="WBC count")
+            rc = st.number_input("Red Blood Cell Count", 1.0, 10.0, 
+                               float(st.session_state.kidney_values.get('rc', 4.5)), 0.1,
+                               help="RBC count")
+            htn = st.selectbox("Hypertension", ["yes", "no"],
+                             index=0 if st.session_state.kidney_values.get('htn', 'no')=='yes' else 1,
+                             help="History of hypertension")
+        with col8:
+            dm = st.selectbox("Diabetes Mellitus", ["yes", "no"],
+                            index=0 if st.session_state.kidney_values.get('dm', 'no')=='yes' else 1,
+                            help="History of diabetes")
+            cad = st.selectbox("Coronary Artery Disease", ["yes", "no"],
+                             index=0 if st.session_state.kidney_values.get('cad', 'no')=='yes' else 1,
+                             help="Coronary artery disease history")
+            appet = st.selectbox("Appetite", ["good", "poor"],
+                               index=0 if st.session_state.kidney_values.get('appet', 'good')=='good' else 1,
+                               help="Patient's appetite")
+        with col9:
+            pe = st.selectbox("Pedal Edema", ["yes", "no"],
+                            index=0 if st.session_state.kidney_values.get('pe', 'no')=='yes' else 1,
+                            help="Swelling in feet")
+            ane = st.selectbox("Anemia", ["yes", "no"],
+                             index=0 if st.session_state.kidney_values.get('ane', 'no')=='yes' else 1,
+                             help="Presence of anemia")
+        st.markdown("<br>", unsafe_allow_html=True)
         
         if st.button("🔍 Predict Kidney Disease", type="primary"):
             # Encode categorical variables
