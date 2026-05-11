@@ -201,61 +201,31 @@ def render_chatbox_page():
     }}
     .hero-3d-img {{
         position: absolute;
-        right: -20px;
+        right: 0px;
         top: 50%;
         transform: translateY(-50%);
-        width: 380px;
+        width: 250px;
         filter: drop-shadow(0 0 30px rgba(0,240,255,0.3));
         z-index: 1;
     }}
 
-    /* Quick Links Grid */
-    .quick-links-title {{
-        color: #e2e8f0;
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin: 2rem 0 1rem 0;
-    }}
-    .quick-link-grid {{
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 15px;
-        margin-bottom: 3rem;
-    }}
-    .quick-card {{
+    /* Button Styling (Quick Links) */
+    div[data-testid="stButton"] > button {{
         background: rgba(30, 11, 46, 0.4);
         border: 1px solid rgba(255,255,255,0.05);
         border-radius: 16px;
-        padding: 1.2rem;
+        padding: 1.2rem 0.5rem;
+        color: white;
+        font-weight: 600;
         transition: all 0.3s ease;
-        cursor: pointer;
+        height: auto;
+        width: 100%;
     }}
-    .quick-card:hover {{
+    div[data-testid="stButton"] > button:hover {{
         background: rgba(30, 11, 46, 0.8);
         border-color: rgba(0, 240, 255, 0.3);
         transform: translateY(-5px);
-    }}
-    .qc-header {{
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 0.8rem;
-    }}
-    .qc-icon {{ font-size: 1.5rem; }}
-    .qc-title {{
-        color: white;
-        font-weight: 600;
-        font-size: 0.95rem;
-        flex-grow: 1;
-    }}
-    .qc-arrow {{
-        color: #64748b;
-        font-size: 1.2rem;
-    }}
-    .qc-desc {{
-        color: #64748b;
-        font-size: 0.8rem;
-        line-height: 1.4;
+        color: #00f0ff;
     }}
     </style>
 
@@ -276,40 +246,22 @@ def render_chatbox_page():
     </div>
 
     <div class="quick-links-title">Try asking about</div>
-    <div class="quick-link-grid">
-        <div class="quick-card">
-            <div class="qc-header">
-                <span class="qc-icon">🫘</span>
-                <span class="qc-title">Kidney Health</span>
-                <span class="qc-arrow">›</span>
-            </div>
-            <div class="qc-desc">Learn about symptoms, tests, and treatment options.</div>
-        </div>
-        <div class="quick-card">
-            <div class="qc-header">
-                <span class="qc-icon">🫀</span>
-                <span class="qc-title">Liver Conditions</span>
-                <span class="qc-arrow">›</span>
-            </div>
-            <div class="qc-desc">Understand liver diseases, causes, and management.</div>
-        </div>
-        <div class="quick-card">
-            <div class="qc-header">
-                <span class="qc-icon">🧠</span>
-                <span class="qc-title">Parkinson's</span>
-                <span class="qc-arrow">›</span>
-            </div>
-            <div class="qc-desc">Explore symptoms, stages, and care strategies.</div>
-        </div>
-        <div class="quick-card">
-            <div class="qc-header">
-                <span class="qc-icon">❤️</span>
-                <span class="qc-title">General Health</span>
-                <span class="qc-arrow">›</span>
-            </div>
-            <div class="qc-desc">Ask general health questions and get guidance.</div>
-        </div>
-    </div>
+    """, unsafe_allow_html=True)
+    
+    # --- QUICK LINKS BUTTONS ---
+    quick_query = None
+    q_cols = st.columns(4)
+    if q_cols[0].button("🫘 Kidney Health", use_container_width=True):
+        quick_query = "Please provide a final verdict and detailed information regarding Kidney Health."
+    if q_cols[1].button("🫀 Liver Conditions", use_container_width=True):
+        quick_query = "Please provide a final verdict and detailed information regarding Liver Conditions."
+    if q_cols[2].button("🧠 Parkinson's", use_container_width=True):
+        quick_query = "Please provide a final verdict and detailed information regarding Parkinson's Disease."
+    if q_cols[3].button("❤️ General Health", use_container_width=True):
+        quick_query = "Please provide a final verdict and general health advice."
+
+    st.markdown("""
+    <style>
 
     <style>
     .disclaimer-card {{
@@ -347,6 +299,7 @@ def render_chatbox_page():
     </div>
     """, unsafe_allow_html=True)
 
+
     # ---------- Session State ----------
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -363,9 +316,16 @@ def render_chatbox_page():
             st.markdown(msg["content"])
 
     user_input = st.chat_input("Describe your symptoms in detail...")
+    
+    # Merge native chat input or quick link button clicks
+    prompt = quick_query if quick_query else user_input
 
-    if not user_input:
+    if not prompt:
         return
+
+    # If a quick link was clicked, jump straight to final verdict stage
+    if quick_query:
+        st.session_state.triage_stage = "final"
 
     # ===== CONTEXT RESET DETECTION (ADDED) =====
     reset_phrases = [
@@ -373,7 +333,7 @@ def render_chatbox_page():
         "that helps", "ok thanks", "all good"
     ]
 
-    if any(p in user_input.lower() for p in reset_phrases):
+    if any(p in prompt.lower() for p in reset_phrases):
         with st.chat_message("assistant"):
             st.markdown(
                 "You're welcome 🙂\n\n"
@@ -385,14 +345,14 @@ def render_chatbox_page():
     # ---------- Store User Message ----------
     st.session_state.messages.append({
         "role": "user",
-        "content": user_input
+        "content": prompt
     })
 
     with st.chat_message("user"):
-        st.markdown(user_input)
+        st.markdown(prompt)
 
     # ---------- Fetch from Convex ----------
-    potential_matches = fetch_top_matches(user_input)
+    potential_matches = fetch_top_matches(prompt)
 
     # ---------- Build DB Context ----------
     if potential_matches:
