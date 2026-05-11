@@ -46,12 +46,13 @@ CUSTOM_CSS = """
 
     /* Headers */
     h1 {
-        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+        background: linear-gradient(135deg, #00f0ff 0%, #ff007f 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-weight: 800 !important;
-        font-size: 3rem !important;
-        margin-bottom: 0.5rem !important;
+        font-weight: 900 !important;
+        font-size: 3.2rem !important;
+        letter-spacing: -1px;
+        margin-bottom: 1.5rem !important;
     }
 
     /* Inputs & Selectboxes Styling */
@@ -158,6 +159,21 @@ CUSTOM_CSS = """
         background: rgba(59, 130, 246, 0.1);
         border: 1px solid rgba(59, 130, 246, 0.3);
         color: #93c5fd;
+    }
+
+    /* Streamlit Alert Overrides (Warning, Info, Success, Error) */
+    div[data-testid="stAlert"] {
+        background: rgba(35, 15, 55, 0.6) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--card-border) !important;
+        border-radius: 15px !important;
+        color: #f4ebff !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    div[data-testid="stAlert"] p {
+        color: #f4ebff !important;
+        font-family: 'Inter', sans-serif !important;
     }
 
     /* Animations */
@@ -525,19 +541,34 @@ CUSTOM_CSS = """
         margin: 0;
     }
 
-    /* Chat Input Area */
+    /* Chat Input Area - Fix Box within Box */
     div[data-testid="stChatInput"] {
-        background: var(--glass-bg);
-        border: 2px solid var(--electric-blue);
-        border-radius: 30px; /* More rounded like a chat app */
-        box-shadow: 0 0 20px rgba(255, 0, 128, 0.2);
-        padding: 0.2rem 1rem;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
         margin-bottom: 1rem;
     }
     
+    div[data-testid="stChatInput"] > div {
+        background: rgba(20, 8, 35, 0.8) !important;
+        border: 2px solid var(--electric-blue) !important;
+        border-radius: 30px !important;
+        box-shadow: 0 0 20px rgba(255, 0, 128, 0.3) !important;
+        padding: 0.5rem 1rem !important;
+    }
+    
+    /* Make inner text area transparent so it blends perfectly */
     div[data-testid="stChatInput"] textarea {
+        background: transparent !important;
         color: white !important;
-        font-size: 1rem;
+        font-size: 1.05rem !important;
+    }
+    
+    /* Style the send button icon */
+    div[data-testid="stChatInput"] button {
+        background: transparent !important;
+        border: none !important;
     }
 
     /* Hide Streamlit Branding */
