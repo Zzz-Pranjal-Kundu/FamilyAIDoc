@@ -4,227 +4,199 @@ Sidebar navigation component for FamilyAIDoc.
 
 import streamlit as st
 from config.settings import PAGES
-
-
-# def render_sidebar():
-#     """
-#     Render the sidebar navigation and information.
-    
-#     Returns:
-#         str: Selected page from navigation
-#     """
-#     st.sidebar.title("🏥 FamilyAIDoc")
-#     st.sidebar.markdown("---")
-    
-#     # Navigation menu
-#     page = st.sidebar.radio(
-#         "Navigate to:",
-#         PAGES
-#     )
-    
-#     st.sidebar.markdown("---")
-#     st.sidebar.info(
-#         "**FamilyAIDoc** uses advanced machine learning algorithms "
-#         "to predict the likelihood of chronic diseases based on clinical parameters."
-#     )
-    
-#     # Footer
-#     st.sidebar.markdown("---")
-#     st.sidebar.markdown("**Developed for Educational Purposes**")
-#     st.sidebar.markdown("© 2025 FamilyAIDoc")
-    
-#     return page
-
-
+from utils.ui_helpers import get_base64_of_bin_file
+import os
 
 def render_sidebar():
     st.sidebar.empty()
 
+    # Get the 3D cross asset
+    cross_b64 = get_base64_of_bin_file(os.path.join("assets", "cross.png"))
+    cross_img_src = f"data:image/png;base64,{cross_b64}" if cross_b64 else ""
+
     # ---------- SIDEBAR THEME ----------
-    st.markdown("""
+    st.markdown(f"""
     <style>
     /* Sidebar shell */
-    section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0b0f14 0%, #020617 100%);
-        border-right: 1px solid rgba(255,255,255,0.05);
-    }
+    section[data-testid="stSidebar"] {{
+        background: #0b051a !important; /* Deep void */
+        border-right: 1px solid rgba(255, 0, 128, 0.15) !important;
+    }}
 
-    section[data-testid="stSidebar"] > div {
+    section[data-testid="stSidebar"] > div {{
         padding: 1.6rem 1.2rem 2rem 1.2rem;
-    }
+    }}
 
-    /* Brand */
-    .sidebar-brand h2 {
-        margin: 0;
-        font-size: 1.45rem;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-        color: #f9fafb;
-    }
-
-    .sidebar-tagline {
-        font-size: 0.7rem;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: #9ca3af;
-        margin-bottom: 1.8rem;
-    }
-    
     /* Brand container */
-    .sidebar-brand-wrap {
+    .sidebar-brand-wrap {{
         padding-bottom: 1.4rem;
         margin-bottom: 1.6rem;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
+    }}
 
-    .sidebar-brand {
+    .sidebar-brand {{
         display: flex;
         align-items: center;
         gap: 12px;
-    }
+    }}
 
-    .sidebar-logo {
+    .sidebar-logo {{
         width: 36px;
         height: 36px;
-        border-radius: 10px;
-        background: linear-gradient(145deg, #14b8a6, #0ea5a5);
+        border-radius: 8px;
+        background: linear-gradient(135deg, #00f0ff, #ff007f);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.1rem;
-        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
-    }
+        box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+    }}
 
-    .sidebar-brand h2 {
+    .sidebar-brand h2 {{
         margin: 0;
-        font-size: 1.45rem;
-        font-weight: 800;
-        letter-spacing: -0.4px;
-        color: #f9fafb;
-        line-height: 1.1;
-    }
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: #ffffff;
+        font-family: 'Outfit', sans-serif;
+    }}
 
-    .sidebar-tagline {
+    .sidebar-tagline {{
         margin-left: 48px;
         margin-top: 0.3rem;
         font-size: 0.65rem;
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        color: #9ca3af;
-    }
-
-    /* Section label */
-    .sidebar-section {
-        font-size: 0.65rem;
         letter-spacing: 2px;
         text-transform: uppercase;
-        color: #6b7280;
-        margin-bottom: 0.6rem;
-    }
+        color: #94a3b8;
+    }}
 
-    /* Radio container */
-    div[data-testid="stRadio"] div[role="radiogroup"] {
-        gap: 6px;
-    }
-
-    /* Radio option */
-    div[data-testid="stRadio"] div[role="radiogroup"] label {
-        position: relative;
-        background: rgba(255,255,255,0.025);
-        border-radius: 10px;
-        padding: 0.55rem 0.75rem 0.55rem 0.85rem;
-        border: 1px solid rgba(255,255,255,0.05);
-        transition: all 0.2s ease;
-        font-size: 0.9rem;
-        color: #e5e7eb;
-    }
-
-    /* Hover */
-    div[data-testid="stRadio"] div[role="radiogroup"] label:hover {
-        background: rgba(20,184,166,0.08);
-        border-color: rgba(20,184,166,0.25);
-    }
-
-    /* ACTIVE PAGE */
-    div[data-testid="stRadio"] input:checked + div {
-        background: rgba(20,184,166,0.14);
-        border-color: rgba(20,184,166,0.6);
-        color: #ecfeff;
-    }
-
-    /* Left accent bar for active item */
-    div[data-testid="stRadio"] input:checked + div::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 6px;
-        bottom: 6px;
-        width: 3px;
-        border-radius: 3px;
-        background: #14b8a6;
-    }
-
-    /* Info box */
-    div[data-testid="stAlert"] {
-        background: rgba(255,255,255,0.035);
-        border-radius: 14px;
-        border: 1px solid rgba(255,255,255,0.06);
-        color: #d1d5db;
-        font-size: 0.85rem;
-        line-height: 1.6;
-    }
-
-    /* Footer */
-    .sidebar-footer {
-        margin-top: 3rem;
-        padding-top: 1.4rem;
-        border-top: 1px solid rgba(255,255,255,0.06);
-        text-align: center;
-    }
-
-    .footer-section {
-        margin-bottom: 0.45rem;
-        font-size: 0.72rem;
-    }
-
-    .footer-muted {
-        color: #9ca3af;
+    /* Section label */
+    .sidebar-section {{
+        font-size: 0.7rem;
         letter-spacing: 1.5px;
         text-transform: uppercase;
-    }
-
-    .footer-strong {
-        color: #e5e7eb;
-        font-weight: 600;
-    }
-
-    .footer-brand {
-        color: #14b8a6;
+        color: #64748b;
+        margin-bottom: 0.8rem;
         font-weight: 700;
-    }
+    }}
 
-    .footer-made {
-        margin-top: 0.8rem;
+    /* Radio container */
+    div[data-testid="stRadio"] div[role="radiogroup"] {{
+        gap: 8px;
+    }}
+
+    /* Radio option */
+    div[data-testid="stRadio"] div[role="radiogroup"] label {{
+        position: relative;
+        background: transparent;
+        border-radius: 12px;
+        padding: 0.6rem 0.8rem;
+        border: 1px solid transparent;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
         color: #cbd5e1;
-        font-size: 0.7rem;
-    }
+    }}
 
-    .heart {
-        display: inline-block;
-        margin: 0 2px;
-    }
+    /* Hover */
+    div[data-testid="stRadio"] div[role="radiogroup"] label:hover {{
+        background: rgba(255, 255, 255, 0.05);
+    }}
 
-    .footer-names {
-        margin-top: 0.5rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.35rem;
-    }
+    /* ACTIVE PAGE */
+    div[data-testid="stRadio"] input:checked + div {{
+        background: rgba(0, 240, 255, 0.08);
+        border-color: rgba(0, 240, 255, 0.3);
+        color: #00f0ff;
+        box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+    }}
 
-    .footer-name {
-        font-size: 0.68rem;
+    /* AI Badge Hack for Chatbot */
+    div[data-testid="stRadio"] div[role="radiogroup"] label:last-child div[data-testid="stMarkdownContainer"] p::after {{
+        content: "AI";
+        background: linear-gradient(135deg, #00f0ff, #3b82f6);
+        color: #0b051a;
+        font-size: 0.65rem;
+        font-weight: 800;
+        padding: 2px 6px;
+        border-radius: 6px;
+        margin-left: auto;
+        float: right;
+    }}
+
+    /* Hide standard st.info */
+    div[data-testid="stAlert"] {{
+        display: none !important;
+    }}
+
+    /* Promo Card */
+    .promo-card {{
+        margin-top: 2rem;
+        background: linear-gradient(145deg, rgba(30, 11, 46, 0.8), rgba(11, 5, 26, 0.9));
+        border: 1px solid rgba(255, 0, 128, 0.3);
+        border-radius: 16px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }}
+
+    .promo-header {{
         color: #94a3b8;
-    }
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 0.8rem;
+    }}
+
+    .promo-text {{
+        color: #f1f5f9;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        max-width: 75%;
+    }}
+
+    .promo-icon {{
+        position: absolute;
+        bottom: -10px;
+        right: -10px;
+        width: 80px;
+        height: 80px;
+        filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6));
+    }}
+
+    /* System Status */
+    .system-status {{
+        margin-top: 3rem;
+    }}
+    .status-header {{
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.65rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #64748b;
+        font-weight: 800;
+        margin-bottom: 0.4rem;
+    }}
+    .dot {{
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #10b981;
+        box-shadow: 0 0 8px #10b981;
+    }}
+    .status-text {{
+        font-size: 0.8rem;
+        color: #94a3b8;
+    }}
+    .version {{
+        margin-top: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: #475569;
+    }}
+
     </style>
     """, unsafe_allow_html=True)
 
@@ -242,7 +214,7 @@ def render_sidebar():
 
     # ---------- NAV ----------
     st.sidebar.markdown(
-        '<div class="sidebar-section">Navigate</div>',
+        '<div class="sidebar-section">Navigation</div>',
         unsafe_allow_html=True
     )
 
@@ -252,42 +224,25 @@ def render_sidebar():
         label_visibility="collapsed"
     )
 
-    # ---------- INFO ----------
-    st.sidebar.markdown("---")
-    st.sidebar.info(
-        "FamilyAIDoc supports **early detection of chronic diseases** using "
-        "clinically validated machine learning models."
-    )
+    # ---------- PROMO CARD ----------
+    st.sidebar.markdown(f"""
+        <div class="promo-card">
+            <div class="promo-header">AI CLINICAL ASSISTANT</div>
+            <div class="promo-text">Advanced medical AI support for faster, smarter, and safer clinical decisions.</div>
+            <img src="{cross_img_src}" class="promo-icon" />
+        </div>
+    """, unsafe_allow_html=True)
 
-    # ---------- FOOTER ----------
-
-    st.sidebar.markdown(
-        """
-        <div class="sidebar-footer">
-            <div class="footer-section footer-muted">
-                ⚖️ <span>Educational Use Only</span>
-            </div>
-            <div class="footer-section footer-strong">
-                © 2026 <span class="footer-brand">FamilyAIDoc</span>
-            </div>
-            <div class="footer-section footer-made">
-                Made with <span class="heart">❤️</span> by
-            </div>
-            <div class="footer-names">
-                <div class="footer-name">👩‍💻 
-                    <a href="https://www.linkedin.com/in/pranjal-kundu-48606b2b3/"
-                    target="_blank"
-                    class="footer-link">
-                        Pranjal Kundu
-                    </a>
-                </div>
-                <div class="footer-name">👩‍💻 Kritika Rana</div>
-                <div class="footer-name">👩‍💻 Yashika Goyal</div>
+    # ---------- SYSTEM STATUS ----------
+    st.sidebar.markdown("""
+        <div class="system-status">
+            <div class="status-header"><div class="dot"></div> SYSTEM STATUS</div>
+            <div class="status-text">All systems operational</div>
+            <div class="version">
+                <span>v2.0.0</span>
+                <span class="dot" style="width: 6px; height: 6px; opacity: 0.5;"></span>
             </div>
         </div>
-        """,
-        unsafe_allow_html=True
-    )
-
+    """, unsafe_allow_html=True)
 
     return page

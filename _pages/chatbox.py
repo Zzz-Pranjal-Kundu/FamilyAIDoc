@@ -124,9 +124,232 @@ def render_chatbox_page():
         page_title="Family AI Medical Assistant",
         layout="centered"
     )
-    st.title("🩺 Interactive Health Assistant")
-    st.caption("AI-powered triage using a verified medical database (Convex + Groq)")
-    st.warning("⚠️ Informational only. Not a substitute for a doctor.")
+    # ---------- MOCKUP CSS & HERO ----------
+    from utils.ui_helpers import get_base64_of_bin_file
+    steth_b64 = get_base64_of_bin_file(os.path.join("assets", "stethoscope.png"))
+    steth_img_src = f"data:image/png;base64,{steth_b64}" if steth_b64 else ""
+
+    st.markdown(f"""
+    <style>
+    /* Chatbox Hero Card */
+    .mockup-hero {{
+        background: linear-gradient(145deg, #180929 0%, #0d0517 100%);
+        border: 1px solid rgba(255, 0, 128, 0.2);
+        border-radius: 24px;
+        padding: 3rem 4rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        position: relative;
+        overflow: hidden;
+    }}
+    .hero-content {{
+        max-width: 60%;
+        z-index: 2;
+    }}
+    .hero-badge {{
+        background: rgba(0, 240, 255, 0.1);
+        color: #00f0ff;
+        border: 1px solid rgba(0, 240, 255, 0.3);
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+    }}
+    .hero-main-title {{
+        font-size: 3.5rem !important;
+        font-weight: 900 !important;
+        line-height: 1.1 !important;
+        margin: 0 0 1rem 0 !important;
+        color: white;
+        background: none !important;
+        -webkit-text-fill-color: initial !important;
+        letter-spacing: -1px;
+    }}
+    .hero-gradient-text {{
+        background: linear-gradient(135deg, #00f0ff 0%, #a855f7 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }}
+    .hero-subtitle {{
+        color: #94a3b8;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }}
+    .hero-warning {{
+        background: rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }}
+    .warning-icon {{
+        color: #00f0ff;
+        font-size: 1.5rem;
+    }}
+    .hero-warning strong {{
+        color: #e2e8f0;
+        font-size: 0.95rem;
+    }}
+    .warning-subtext {{
+        color: #64748b;
+        font-size: 0.85rem;
+    }}
+    .hero-3d-img {{
+        position: absolute;
+        right: -20px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 380px;
+        filter: drop-shadow(0 0 30px rgba(0,240,255,0.3));
+        z-index: 1;
+    }}
+
+    /* Quick Links Grid */
+    .quick-links-title {{
+        color: #e2e8f0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 2rem 0 1rem 0;
+    }}
+    .quick-link-grid {{
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 3rem;
+    }}
+    .quick-card {{
+        background: rgba(30, 11, 46, 0.4);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 16px;
+        padding: 1.2rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }}
+    .quick-card:hover {{
+        background: rgba(30, 11, 46, 0.8);
+        border-color: rgba(0, 240, 255, 0.3);
+        transform: translateY(-5px);
+    }}
+    .qc-header {{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 0.8rem;
+    }}
+    .qc-icon {{ font-size: 1.5rem; }}
+    .qc-title {{
+        color: white;
+        font-weight: 600;
+        font-size: 0.95rem;
+        flex-grow: 1;
+    }}
+    .qc-arrow {{
+        color: #64748b;
+        font-size: 1.2rem;
+    }}
+    .qc-desc {{
+        color: #64748b;
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }}
+    </style>
+
+    <div class="mockup-hero">
+        <div class="hero-content">
+            <span class="hero-badge">AI ASSISTANT</span>
+            <h1 class="hero-main-title">Interactive<br/><span class="hero-gradient-text">Health Assistant</span></h1>
+            <p class="hero-subtitle">AI-powered triage using a verified medical database (Convex + Groq)</p>
+            <div class="hero-warning">
+                <span class="warning-icon">ⓘ</span>
+                <div>
+                    <strong>Informational only. Not a substitute for a doctor.</strong><br/>
+                    <span class="warning-subtext">For medical emergencies, contact your healthcare provider.</span>
+                </div>
+            </div>
+        </div>
+        <img src="{steth_img_src}" class="hero-3d-img" />
+    </div>
+
+    <div class="quick-links-title">Try asking about</div>
+    <div class="quick-link-grid">
+        <div class="quick-card">
+            <div class="qc-header">
+                <span class="qc-icon">🫘</span>
+                <span class="qc-title">Kidney Health</span>
+                <span class="qc-arrow">›</span>
+            </div>
+            <div class="qc-desc">Learn about symptoms, tests, and treatment options.</div>
+        </div>
+        <div class="quick-card">
+            <div class="qc-header">
+                <span class="qc-icon">🫀</span>
+                <span class="qc-title">Liver Conditions</span>
+                <span class="qc-arrow">›</span>
+            </div>
+            <div class="qc-desc">Understand liver diseases, causes, and management.</div>
+        </div>
+        <div class="quick-card">
+            <div class="qc-header">
+                <span class="qc-icon">🧠</span>
+                <span class="qc-title">Parkinson's</span>
+                <span class="qc-arrow">›</span>
+            </div>
+            <div class="qc-desc">Explore symptoms, stages, and care strategies.</div>
+        </div>
+        <div class="quick-card">
+            <div class="qc-header">
+                <span class="qc-icon">❤️</span>
+                <span class="qc-title">General Health</span>
+                <span class="qc-arrow">›</span>
+            </div>
+            <div class="qc-desc">Ask general health questions and get guidance.</div>
+        </div>
+    </div>
+
+    <style>
+    .disclaimer-card {{
+        background: rgba(30, 11, 46, 0.4);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 16px;
+        padding: 1.2rem;
+        display: flex;
+        gap: 15px;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+    }}
+    .disclaimer-icon {{
+        font-size: 1.8rem;
+        color: #3b82f6;
+    }}
+    .disclaimer-title {{
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.3rem;
+    }}
+    .disclaimer-text {{
+        color: #64748b;
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }}
+    </style>
+    <div class="disclaimer-card">
+        <div class="disclaimer-icon">🛡️</div>
+        <div>
+            <div class="disclaimer-title">Important Disclaimer</div>
+            <div class="disclaimer-text">FamilyAIDoc provides AI-assisted information only and is not a diagnostic device.<br/>Always consult qualified healthcare professionals for medical advice.</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # ---------- Session State ----------
     if "messages" not in st.session_state:
