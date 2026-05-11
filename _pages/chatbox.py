@@ -16,14 +16,8 @@ import io
 
 load_dotenv()
 
-# Attempt to load from environment first, then fallback to Streamlit secrets
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-if not GROQ_API_KEY and hasattr(st, "secrets") and "GROQ_API_KEY" in st.secrets:
-    GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
-
 CONVEX_URL = os.getenv("CONVEX_URL")
-if not CONVEX_URL and hasattr(st, "secrets") and "CONVEX_URL" in st.secrets:
-    CONVEX_URL = st.secrets["CONVEX_URL"]
 
 
 # CLIENT SETUP
@@ -130,8 +124,8 @@ def render_chatbox_page():
         page_title="Family AI Medical Assistant",
         layout="centered"
     )
-    st.markdown("<h1>🩺 Interactive Health Assistant</h1>", unsafe_allow_html=True)
-    st.markdown('<p style="color: var(--text-muted); font-size: 1.1rem;">AI-powered triage using a verified medical database (Convex + Groq)</p>', unsafe_allow_html=True)
+    st.title("🩺 Interactive Health Assistant")
+    st.caption("AI-powered triage using a verified medical database (Convex + Groq)")
     st.warning("⚠️ Informational only. Not a substitute for a doctor.")
 
     # ---------- Session State ----------
