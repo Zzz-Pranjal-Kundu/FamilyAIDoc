@@ -16,8 +16,14 @@ import io
 
 load_dotenv()
 
+# Attempt to load from environment first, then fallback to Streamlit secrets
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+if not GROQ_API_KEY and hasattr(st, "secrets") and "GROQ_API_KEY" in st.secrets:
+    GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+
 CONVEX_URL = os.getenv("CONVEX_URL")
+if not CONVEX_URL and hasattr(st, "secrets") and "CONVEX_URL" in st.secrets:
+    CONVEX_URL = st.secrets["CONVEX_URL"]
 
 
 # CLIENT SETUP
