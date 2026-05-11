@@ -483,39 +483,61 @@ CUSTOM_CSS = """
     /* ----- Chatbot UI Specific ----- */
     div[data-testid="stChatMessage"] {
         background-color: var(--card-bg);
-        border: 1px solid var(--card-border);
-        border-radius: 15px;
-        padding: 1rem;
-        margin-bottom: 1rem;
+        padding: 1rem 1.2rem;
+        margin-bottom: 1.5rem;
         backdrop-filter: blur(10px);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        width: fit-content;
+        max-width: 85%;
+        display: flex;
+        gap: 1rem;
     }
     
-    /* User Message */
+    /* User Message (Aligned Right) */
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) {
-        border-color: rgba(0, 240, 255, 0.4);
-        background: linear-gradient(135deg, rgba(0, 240, 255, 0.05) 0%, rgba(35, 15, 55, 0.6) 100%);
+        margin-left: auto; /* Pushes to the right */
+        flex-direction: row-reverse; /* Puts avatar on the right */
+        border: 1px solid rgba(0, 240, 255, 0.4);
+        background: linear-gradient(135deg, rgba(35, 15, 55, 0.8) 0%, rgba(0, 240, 255, 0.1) 100%);
         border-right: 4px solid var(--primary-mint);
+        border-radius: 25px 25px 5px 25px; /* Chat bubble tail on bottom right */
+    }
+    
+    /* Fix avatar spacing for user (since it's reversed) */
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) > div:first-child {
+        margin-left: 0.5rem;
     }
 
-    /* Assistant Message */
+    /* Assistant Message (Aligned Left) */
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) {
-        border-color: rgba(255, 0, 128, 0.4);
-        background: linear-gradient(135deg, rgba(255, 0, 128, 0.05) 0%, rgba(35, 15, 55, 0.6) 100%);
+        margin-right: auto; /* Keeps it on the left */
+        border: 1px solid rgba(255, 0, 128, 0.4);
+        background: linear-gradient(135deg, rgba(35, 15, 55, 0.8) 0%, rgba(255, 0, 128, 0.1) 100%);
         border-left: 4px solid var(--electric-blue);
+        border-radius: 25px 25px 25px 5px; /* Chat bubble tail on bottom left */
+    }
+
+    /* Message Text Color */
+    div[data-testid="stChatMessage"] p {
+        color: #ffffff;
+        font-size: 1rem;
+        line-height: 1.5;
+        margin: 0;
     }
 
     /* Chat Input Area */
     div[data-testid="stChatInput"] {
         background: var(--glass-bg);
         border: 2px solid var(--electric-blue);
-        border-radius: 20px;
+        border-radius: 30px; /* More rounded like a chat app */
         box-shadow: 0 0 20px rgba(255, 0, 128, 0.2);
-        padding: 0.5rem;
+        padding: 0.2rem 1rem;
+        margin-bottom: 1rem;
     }
     
     div[data-testid="stChatInput"] textarea {
         color: white !important;
+        font-size: 1rem;
     }
 
     /* Hide Streamlit Branding */
