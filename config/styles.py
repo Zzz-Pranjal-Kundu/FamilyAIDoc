@@ -480,6 +480,44 @@ CUSTOM_CSS = """
         letter-spacing: 0.5px;
     }
 
+    /* ----- Chatbot UI Specific ----- */
+    div[data-testid="stChatMessage"] {
+        background-color: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 15px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* User Message */
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) {
+        border-color: rgba(0, 240, 255, 0.4);
+        background: linear-gradient(135deg, rgba(0, 240, 255, 0.05) 0%, rgba(35, 15, 55, 0.6) 100%);
+        border-right: 4px solid var(--primary-mint);
+    }
+
+    /* Assistant Message */
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) {
+        border-color: rgba(255, 0, 128, 0.4);
+        background: linear-gradient(135deg, rgba(255, 0, 128, 0.05) 0%, rgba(35, 15, 55, 0.6) 100%);
+        border-left: 4px solid var(--electric-blue);
+    }
+
+    /* Chat Input Area */
+    div[data-testid="stChatInput"] {
+        background: var(--glass-bg);
+        border: 2px solid var(--electric-blue);
+        border-radius: 20px;
+        box-shadow: 0 0 20px rgba(255, 0, 128, 0.2);
+        padding: 0.5rem;
+    }
+    
+    div[data-testid="stChatInput"] textarea {
+        color: white !important;
+    }
+
     /* Hide Streamlit Branding */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
